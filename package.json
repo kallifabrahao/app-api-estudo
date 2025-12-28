@@ -1,20 +1,30 @@
 {
-  "name": "app-api-estudo",
+  "name": "app-english",
   "version": "1.0.0",
-  "description": "",
   "main": "index.js",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+  "type": "module",
+    "engines": {
+    "node": "20.x"
   },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/kallifabrahao/app-api-estudo.git"
+  "scripts": {
+    "dev": "nodemon src/app.js",
+    "start": "node src/app.js"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
-  "bugs": {
-    "url": "https://github.com/kallifabrahao/app-api-estudo/issues"
+  "description": "",
+  "dependencies": {
+    "bcryptjs": "^3.0.3",
+    "cors": "^2.8.5",
+    "dotenv": "^17.2.3",
+    "express": "^5.2.1",
+    "googleapis": "^169.0.0",
+    "jsonwebtoken": "^9.0.3",
+    "mongoose": "^9.0.2",
+    "multer": "^2.0.2"
   },
-  "homepage": "https://github.com/kallifabrahao/app-api-estudo#readme"
+  "devDependencies": {
+    "nodemon": "^3.1.11"
+  }
 }

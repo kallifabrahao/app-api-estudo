@@ -1,0 +1,34 @@
+import express from "express";
+import cors from "cors";
+import frasesRouter from "./frases.js";
+import authRouter from "./auth.js";
+import licoesRouter from "./licoes.js";
+import audioRouter from "./audio.js";
+import textoRouter from "./texto.js";
+import temasRouter from "./temas.js";
+
+const corsOptions = {
+  origin: process.env.NODE_ENV === "production" ? [process.env.FRONT_END] : "*",
+  methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
+  credentials: true,
+  optionsSuccessStatus: 204,
+};
+
+const router = (app) => {
+  app.route("/").get((req, res) => {
+    res.status(200).send({ status: "ok" });
+  });
+
+  app.use(
+    express.json(),
+    cors(corsOptions),
+    frasesRouter,
+    authRouter,
+    licoesRouter,
+    audioRouter,
+    textoRouter,
+    temasRouter
+  );
+};
+
+export default router;
