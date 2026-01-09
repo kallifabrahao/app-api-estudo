@@ -4,13 +4,17 @@ import Frases from "../models/frases.js";
 
 const criarLicaoService = async (data) => {
   return Licoes.create({
+    idTema: data.idTema,
+    descricao: data.descricao,
     titulo: data.titulo,
-    status: data.status ?? "estudando",
+    status: "estudando",
   });
 };
 
-const listarLicoesService = async () => {
-  return Licoes.find({ deletedAt: null }).sort({ createdAt: -1 });
+const listarLicoesService = async (idTema, status) => {
+  return Licoes.find({ idTema, deletedAt: null, status }).sort({
+    createdAt: -1,
+  });
 };
 
 const deletarLicaoService = async (licaoId) => {
@@ -27,10 +31,18 @@ const deletarLicaoService = async (licaoId) => {
   return { message: "Lição e dependências removidas com sucesso" };
 };
 
-const atualizarLicaoService = async (id, data) => {
+const atualizarLicaoService = async (_id, data) => {
   return Licoes.findByIdAndUpdate(
-    id,
+    _id,
     { ...data, updatedAt: new Date() },
+    { new: true }
+  );
+};
+
+const atualizarStatusLicaoService = async (_id, status) => {
+  return Licoes.findByIdAndUpdate(
+    _id,
+    { status, updatedAt: new Date() },
     { new: true }
   );
 };
@@ -40,4 +52,5 @@ export {
   listarLicoesService,
   deletarLicaoService,
   atualizarLicaoService,
+  atualizarStatusLicaoService,
 };

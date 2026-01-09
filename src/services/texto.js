@@ -1,5 +1,5 @@
 import Texto from "../models/texto.js";
-import { salvarAudio } from "./audio.js";
+import { salvarAudio, deletarAudioService } from "./audio.js";
 
 const criarTextoService = async (body, files) => {
   const audioId = await salvarAudio(files);
@@ -22,12 +22,34 @@ const listarTextosPorLicaoService = async (idLicao) => {
 };
 
 const deletarTextoService = async (textoId) => {
+  const textoExistente = await Texto.findById(textoId);
+
+  if (!textoExistente) {
+    throw new Error("Texto não encontrado");
+  }
+
+  const audioId = textoExistente.audioCompleto;
+  await deletarAudioService(audioId);
   await Texto.findByIdAndDelete(textoId);
 
   return { message: "Texto removido com sucesso" };
 };
 
-const atualizarTextoService = async (textoId, data) => {
+const atualizarTextoService = async (textoId, data, files) => {
+  const textoExistente = await Texto.findById(textoId);
+
+  if (!textoExistente) {
+    throw new Error("Texto não encontrado");
+  }
+
+  const audioId = textoExistente.audioCompleto;
+
+  if (files) {
+    await deletarAudioService(audioId);
+    const novoAudioId = await salvarAudio(files);
+    data.audioCompleto = novoAudioId;
+  }
+
   return Texto.findByIdAndUpdate(textoId, data, { new: true });
 };
 

@@ -6,6 +6,7 @@ import licoesRouter from "./licoes.js";
 import audioRouter from "./audio.js";
 import textoRouter from "./texto.js";
 import temasRouter from "./temas.js";
+import { verifyToken } from "../middlewares/verificarToken.js";
 
 const corsOptions = {
   origin: process.env.NODE_ENV === "production" ? [process.env.FRONT_END] : "*",
@@ -22,10 +23,11 @@ const router = (app) => {
   app.use(
     express.json(),
     cors(corsOptions),
-    frasesRouter,
     authRouter,
-    licoesRouter,
+    verifyToken,
     audioRouter,
+    frasesRouter,
+    licoesRouter,
     textoRouter,
     temasRouter
   );

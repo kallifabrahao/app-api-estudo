@@ -3,6 +3,7 @@ import {
   listarLicoesService,
   deletarLicaoService,
   atualizarLicaoService,
+  atualizarStatusLicaoService,
 } from "../services/licoes.js";
 
 const criarLicao = async (req, res) => {
@@ -17,7 +18,10 @@ const criarLicao = async (req, res) => {
 
 const listarLicoes = async (req, res) => {
   try {
-    const licoes = await listarLicoesService();
+    const licoes = await listarLicoesService(
+      req.params.idTema,
+      req.query.status
+    );
     return res.json(licoes);
   } catch (error) {
     console.error(error);
@@ -45,4 +49,25 @@ const atualizarLicao = async (req, res) => {
   }
 };
 
-export { criarLicao, listarLicoes, deletarLicao, atualizarLicao };
+const atualizarStatusLicao = async (req, res) => {
+  try {
+    const licao = await atualizarStatusLicaoService(
+      req.params.id,
+      req.body.status
+    );
+    return res.json(licao);
+  } catch (error) {
+    console.error(error);
+    return res
+      .status(500)
+      .json({ message: "Erro ao atualizar status da lição" });
+  }
+};
+
+export {
+  criarLicao,
+  listarLicoes,
+  deletarLicao,
+  atualizarLicao,
+  atualizarStatusLicao,
+};

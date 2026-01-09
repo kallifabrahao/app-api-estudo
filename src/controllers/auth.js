@@ -14,7 +14,21 @@ const login = async (req, res) => {
     const result = await loginService(req.body);
     return res.status(200).json(result);
   } catch (error) {
-    return res.status(401).json({ message: error.message });
+    if (error.message === "Credenciais inválidas") {
+      return res.status(403).json({ message: error.message });
+    }
+
+    if (error.message === "Unauthorized") {
+      return res.status(401).json({ message: error.message });
+    }
+
+    return res.status(500).json({
+      message: {
+        title: "Erro inesperado",
+        subTitle:
+          "Ocorreu um erro inesperado. Por favor, tente novamente mais tarde.",
+      },
+    });
   }
 };
 

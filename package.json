@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "main": "index.js",
   "type": "module",
-    "engines": {
+  "engines": {
     "node": "20.x"
   },
   "scripts": {
@@ -21,6 +21,7 @@
     "express": "^5.2.1",
     "googleapis": "^169.0.0",
     "jsonwebtoken": "^9.0.3",
+    "mongodb": "^7.0.0",
     "mongoose": "^9.0.2",
     "multer": "^2.0.2"
   },
