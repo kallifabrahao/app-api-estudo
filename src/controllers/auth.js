@@ -25,8 +25,7 @@ const login = async (req, res) => {
     return res.status(500).json({
       message: {
         title: "Erro inesperado",
-        subTitle:
-          "Ocorreu um erro inesperado. Por favor, tente novamente mais tarde.",
+        subTitle: error.message || "Por favor, tente novamente mais tarde.",
       },
     });
   }
