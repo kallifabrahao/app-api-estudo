@@ -13,7 +13,7 @@ const FrasesSchema = new mongoose.Schema(
     },
     audioCurto: {
       type: mongoose.Schema.Types.ObjectId,
-      required: true,
+      required: false,
     },
   },
   { timestamps: true }

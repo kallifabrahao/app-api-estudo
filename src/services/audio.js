@@ -20,6 +20,12 @@ const salvarAudio = async (file) => {
 };
 
 const streamAudioService = async (req, res) => {
+  const { id } = req.params;
+
+  if (!id || !mongoose.Types.ObjectId.isValid(id)) {
+    return res.sendStatus(204);
+  }
+
   const db = mongoose.connection.db;
   const bucket = new mongoose.mongo.GridFSBucket(db, {
     bucketName: "audios",
@@ -63,12 +69,25 @@ const streamAudioService = async (req, res) => {
 };
 
 const deletarAudioService = async (audioId) => {
+  // 🔒 proteção absoluta
+  if (!audioId || !mongoose.Types.ObjectId.isValid(audioId)) {
+    return;
+  }
+
   const db = mongoose.connection.db;
   const bucket = new mongoose.mongo.GridFSBucket(db, {
     bucketName: "audios",
   });
 
-  await bucket.delete(new mongoose.Types.ObjectId(audioId));
+  const objectId = new mongoose.Types.ObjectId(audioId);
+
+  const files = await bucket.find({ _id: objectId }).toArray();
+
+  if (!files || files.length === 0) {
+    return;
+  }
+
+  await bucket.delete(objectId);
 
   return { message: "Áudio removido com sucesso" };
 };

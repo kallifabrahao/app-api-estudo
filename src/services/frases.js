@@ -2,7 +2,11 @@ import Frases from "../models/frases.js";
 import { salvarAudio, deletarAudioService } from "./audio.js";
 
 const criarFraseService = async (body, files) => {
-  const audioId = await salvarAudio(files);
+  let audioId = null;
+
+  if (files.length > 0) {
+    audioId = await salvarAudio(files);
+  }
 
   return Frases.create({
     idLicao: body.idLicao,
@@ -45,10 +49,12 @@ const atualizarFraseService = async (fraseId, data, files) => {
 
   const audioId = fraseExistente.audioCurto;
 
-  if (files) {
+  if (files.length > 0) {
     await deletarAudioService(audioId);
     const novoAudioId = await salvarAudio(files);
     data.audioCurto = novoAudioId;
+  } else {
+    data.audioCurto = audioId;
   }
 
   return Frases.findByIdAndUpdate(fraseId, data, { new: true });

@@ -1,14 +1,30 @@
 import Texto from "../models/texto.js";
 import { salvarAudio, deletarAudioService } from "./audio.js";
+import { parseTextoParaFrases } from "../utils/parse.js";
+import { criarFraseService } from "./frases.js";
 
 const criarTextoService = async (body, files) => {
   const audioId = await salvarAudio(files);
 
-  return Texto.create({
+  const textoCriado = await Texto.create({
     idLicao: body.idLicao,
     texto: body.texto,
     audioCompleto: audioId,
   });
+
+  const frases = parseTextoParaFrases(body.texto);
+
+  for (const frase of frases) {
+    await criarFraseService(
+      {
+        idLicao: body.idLicao,
+        frase,
+      },
+      []
+    );
+  }
+
+  return textoCriado;
 };
 
 const listarTextosPorLicaoService = async (idLicao) => {
@@ -44,7 +60,7 @@ const atualizarTextoService = async (textoId, data, files) => {
 
   const audioId = textoExistente.audioCompleto;
 
-  if (files) {
+  if (files.length > 0) {
     await deletarAudioService(audioId);
     const novoAudioId = await salvarAudio(files);
     data.audioCompleto = novoAudioId;

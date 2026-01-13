@@ -13,7 +13,7 @@ const criarLicaoService = async (data) => {
 
 const listarLicoesService = async (idTema, status) => {
   return Licoes.find({ idTema, deletedAt: null, status }).sort({
-    createdAt: -1,
+    createdAt: 1,
   });
 };
 
