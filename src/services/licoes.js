@@ -1,5 +1,4 @@
 import Licoes from "../models/licoes.js";
-import Texto from "../models/texto.js";
 import Frases from "../models/frases.js";
 
 const criarLicaoService = async (data) => {
@@ -19,10 +18,6 @@ const listarLicoesService = async (idTema, status) => {
 
 const deletarLicaoService = async (licaoId) => {
   await Frases.deleteMany({
-    idLicao: licaoId,
-  });
-
-  await Texto.deleteMany({
     idLicao: licaoId,
   });
 

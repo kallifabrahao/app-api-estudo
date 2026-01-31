@@ -1,22 +1,14 @@
 import mongoose from "mongoose";
 
-const FrasesSchema = new mongoose.Schema(
+const AudioSchema = new mongoose.Schema(
   {
     idLicao: {
       type: String,
       ref: "Licoes",
       required: true,
     },
-    frase: {
+    idAudio: {
       type: String,
-      required: true,
-    },
-    inicioAudio: {
-      type: Number,
-      required: false,
-    },
-    fimAudio: {
-      type: Number,
       required: false,
     },
     createdAt: { type: Date, default: Date.now },
@@ -26,4 +18,4 @@ const FrasesSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
-export default mongoose.model("Frases", FrasesSchema);
+export default mongoose.model("Audio", AudioSchema);

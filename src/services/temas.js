@@ -1,6 +1,5 @@
 import Temas from "../models/temas.js";
 import Licoes from "../models/licoes.js";
-import Texto from "../models/texto.js";
 import Frases from "../models/frases.js";
 
 const listarTemasService = async () => {
@@ -23,10 +22,6 @@ const deletarTemaService = async (temaId) => {
   const licoesIds = licoes.map((l) => l._id);
 
   await Frases.deleteMany({
-    idLicao: { $in: licoesIds },
-  });
-
-  await Texto.deleteMany({
     idLicao: { $in: licoesIds },
   });
 

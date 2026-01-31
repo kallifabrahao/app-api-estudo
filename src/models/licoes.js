@@ -8,7 +8,7 @@ const LicoesSchema = new mongoose.Schema(
       required: true,
     },
     titulo: { type: String, required: true },
-    descricao: { type: String, required: true },
+    descricao: { type: String, required: false },
     status: { type: String, required: false, default: "estudando" },
     createdAt: { type: Date, default: Date.now },
     deletedAt: { type: Date, default: null },

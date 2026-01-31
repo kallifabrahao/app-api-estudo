@@ -4,7 +4,6 @@ import frasesRouter from "./frases.js";
 import authRouter from "./auth.js";
 import licoesRouter from "./licoes.js";
 import audioRouter from "./audio.js";
-import textoRouter from "./texto.js";
 import temasRouter from "./temas.js";
 import { verifyToken } from "../middlewares/verificarToken.js";
 
@@ -27,8 +26,7 @@ const router = (app) => {
     verifyToken,
     audioRouter,
     frasesRouter,
-    licoesRouter,
-    textoRouter,
+    licoesRouter, 
     temasRouter
   );
 };

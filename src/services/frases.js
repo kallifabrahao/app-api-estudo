@@ -1,28 +1,39 @@
 import Frases from "../models/frases.js";
 import { salvarAudio, deletarAudioService } from "./audio.js";
+import { parseTextoParaFrases } from "../utils/parse.js";
+import Audio from "../models/audio.js";
 
 const criarFraseService = async (body, files) => {
-  let audioId = null;
-
   if (files.length > 0) {
-    audioId = await salvarAudio(files);
+    const audioId = await salvarAudio(files);
+    await Audio.create({
+      idLicao: body.idLicao,
+      idAudio: audioId,
+    });
   }
 
-  return Frases.create({
-    idLicao: body.idLicao,
-    frase: body.frase,
-    audioCurto: audioId,
-  });
+  const frases = parseTextoParaFrases(body.frase);
+
+  for (const frase of frases) {
+    await Frases.create({
+      idLicao: body.idLicao,
+      frase,
+      inicioAudio: 0,
+      fimAudio: 0,
+    });
+  }
+
+  return true;
 };
 
 const listarFrasesPorLicaoService = async (idLicao) => {
   const frases = await Frases.find({ idLicao }).sort({ createdAt: 1 });
+  const audio = await Audio.findOne({ idLicao });
 
-  return frases.map((frase) => ({
-    _id: frase._id,
-    frase: frase.frase,
-    audioUrl: `${process.env.API_URL}/audios/${frase.audioCurto}`,
-  }));
+  return {
+    frases,
+    audioUrl: audio ? `${process.env.API_URL}/audios/${audio.idAudio}` : null,
+  };
 };
 
 const deletarFraseService = async (fraseId) => {
@@ -32,7 +43,7 @@ const deletarFraseService = async (fraseId) => {
     throw new Error("Frase não encontrada");
   }
 
-  const audioId = fraseExistente.audioCurto;
+  const audioId = fraseExistente.audio;
   await deletarAudioService(audioId);
 
   await Frases.findByIdAndDelete(fraseId);
@@ -47,14 +58,14 @@ const atualizarFraseService = async (fraseId, data, files) => {
     throw new Error("Frase não encontrada");
   }
 
-  const audioId = fraseExistente.audioCurto;
+  const audioId = fraseExistente.audio;
 
   if (files.length > 0) {
     await deletarAudioService(audioId);
     const novoAudioId = await salvarAudio(files);
-    data.audioCurto = novoAudioId;
+    data.audio = novoAudioId;
   } else {
-    data.audioCurto = audioId;
+    data.audio = audioId;
   }
 
   return Frases.findByIdAndUpdate(fraseId, data, { new: true });
