@@ -56,7 +56,9 @@ const deletarFraseService = async (fraseId) => {
 const atualizarFraseService = async (fraseId, data) => {
   const fraseExistente = await Frases.findById(fraseId);
 
-  data.traducao = (await translate(data.frase, { to: "pt" })).text;
+  if (data.traducao === "" || !data.traducao) {
+    data.traducao = (await translate(data.frase, { to: "pt" })).text;
+  }
 
   if (!fraseExistente) {
     throw new Error("Frase não encontrada");
