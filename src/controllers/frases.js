@@ -45,7 +45,6 @@ const atualizarFrase = async (req, res) => {
     const fraseAtualizada = await atualizarFraseService(
       req.params.id,
       req.body,
-      req.files
     );
     return res.json(fraseAtualizada);
   } catch (error) {

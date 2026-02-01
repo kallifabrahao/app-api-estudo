@@ -1,6 +1,7 @@
 import { Readable } from "stream";
 import mongoose from "mongoose";
 import { getBucket } from "../config/database.js";
+import Audio from "../models/audio.js";
 
 const salvarAudio = async (file) => {
   const bucket = getBucket();
@@ -92,4 +93,15 @@ const deletarAudioService = async (audioId) => {
   return { message: "Áudio removido com sucesso" };
 };
 
-export { salvarAudio, streamAudioService, deletarAudioService };
+const atualizarAudio = async (idLicao, files) => {
+  const audioRegistro = await Audio.findOne({ idLicao });
+
+  if (audioRegistro) {
+    await deletarAudioService(audioRegistro.idAudio);
+    const novoAudioId = await salvarAudio(files);
+    audioRegistro.idAudio = novoAudioId;
+    await audioRegistro.save();
+  }
+};
+
+export { salvarAudio, streamAudioService, deletarAudioService, atualizarAudio };

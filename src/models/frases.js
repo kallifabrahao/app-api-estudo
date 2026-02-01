@@ -11,6 +11,10 @@ const FrasesSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
+    traducao: {
+      type: String,
+      required: false,
+    },
     inicioAudio: {
       type: Number,
       required: false,
@@ -23,7 +27,7 @@ const FrasesSchema = new mongoose.Schema(
     deletedAt: { type: Date, default: null },
     updatedAt: { type: Date, default: null },
   },
-  { timestamps: true }
+  { timestamps: true },
 );
 
 export default mongoose.model("Frases", FrasesSchema);

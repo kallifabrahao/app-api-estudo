@@ -2,10 +2,12 @@ import Frases from "../models/frases.js";
 import { salvarAudio, deletarAudioService } from "./audio.js";
 import { parseTextoParaFrases } from "../utils/parse.js";
 import Audio from "../models/audio.js";
+import { translate } from "@vitalets/google-translate-api";
 
 const criarFraseService = async (body, files) => {
   if (files.length > 0) {
     const audioId = await salvarAudio(files);
+
     await Audio.create({
       idLicao: body.idLicao,
       idAudio: audioId,
@@ -51,21 +53,13 @@ const deletarFraseService = async (fraseId) => {
   return { message: "Frase removida com sucesso" };
 };
 
-const atualizarFraseService = async (fraseId, data, files) => {
+const atualizarFraseService = async (fraseId, data) => {
   const fraseExistente = await Frases.findById(fraseId);
+
+  data.traducao = (await translate(data.frase, { to: "pt" })).text;
 
   if (!fraseExistente) {
     throw new Error("Frase não encontrada");
-  }
-
-  const audioId = fraseExistente.audio;
-
-  if (files.length > 0) {
-    await deletarAudioService(audioId);
-    const novoAudioId = await salvarAudio(files);
-    data.audio = novoAudioId;
-  } else {
-    data.audio = audioId;
   }
 
   return Frases.findByIdAndUpdate(fraseId, data, { new: true });
