@@ -57,7 +57,7 @@ const atualizarFraseService = async (fraseId, data) => {
   const fraseExistente = await Frases.findById(fraseId);
 
   if (data.traducao === "" || !data.traducao) {
-    data.traducao = (await translate(data.frase, { to: "pt" })).text;
+    data.traducao = (await translate(data.frase, { to: data.idioma })).text;
   }
 
   if (!fraseExistente) {

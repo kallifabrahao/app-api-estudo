@@ -21,51 +21,63 @@ const salvarAudio = async (file) => {
 };
 
 const streamAudioService = async (req, res) => {
-  const { id } = req.params;
+  try {
+    const { id } = req.params;
 
-  if (!id || !mongoose.Types.ObjectId.isValid(id)) {
-    return res.sendStatus(204);
-  }
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      return res.sendStatus(400);
+    }
 
-  const db = mongoose.connection.db;
-  const bucket = new mongoose.mongo.GridFSBucket(db, {
-    bucketName: "audios",
-  });
+    const audioId = new mongoose.Types.ObjectId(id);
+    const db = mongoose.connection.db;
 
-  const audioId = new mongoose.Types.ObjectId(req.params.id);
-
-  const files = await bucket.find({ _id: audioId }).toArray();
-
-  if (!files || files.length === 0) {
-    return res.status(404).json({ message: "Áudio não encontrado" });
-  }
-
-  const file = files[0];
-  const fileSize = file.length;
-  const range = req.headers.range;
-
-  if (range) {
-    const parts = range.replace(/bytes=/, "").split("-");
-    const start = parseInt(parts[0], 10);
-    const end = parts[1] ? parseInt(parts[1], 10) : fileSize - 1;
-
-    const chunkSize = end - start + 1;
-
-    res.writeHead(206, {
-      "Content-Range": `bytes ${start}-${end}/${fileSize}`,
-      "Accept-Ranges": "bytes",
-      "Content-Length": chunkSize,
-      "Content-Type": file.contentType || "audio/mpeg",
+    const bucket = new mongoose.mongo.GridFSBucket(db, {
+      bucketName: "audios",
     });
 
-    bucket.openDownloadStream(audioId, { start, end: end + 1 }).pipe(res);
-  } else {
-    res.writeHead(200, {
-      "Content-Length": fileSize,
-      "Content-Type": file.contentType || "audio/mpeg",
+    const file = await db.collection("audios.files").findOne({ _id: audioId });
+
+    if (!file) return res.sendStatus(404);
+
+    const fileSize = file.length;
+    const range = req.headers.range;
+
+    let downloadStream;
+
+    if (range) {
+      const parts = range.replace(/bytes=/, "").split("-");
+      const start = Number(parts[0]);
+      const end = parts[1] ? Number(parts[1]) : fileSize - 1;
+
+      res.writeHead(206, {
+        "Content-Range": `bytes ${start}-${end}/${fileSize}`,
+        "Accept-Ranges": "bytes",
+        "Content-Length": end - start + 1,
+        "Content-Type": file.contentType || "audio/mpeg",
+      });
+
+      downloadStream = bucket.openDownloadStream(audioId, {
+        start,
+        end: end + 1,
+      });
+    } else {
+      res.writeHead(200, {
+        "Content-Length": fileSize,
+        "Content-Type": file.contentType || "audio/mpeg",
+      });
+
+      downloadStream = bucket.openDownloadStream(audioId);
+    }
+
+    downloadStream.on("error", (err) => {
+      console.error(err);
+      if (!res.headersSent) res.sendStatus(500);
     });
 
-    bucket.openDownloadStream(audioId).pipe(res);
+    downloadStream.pipe(res);
+  } catch (err) {
+    console.error(err);
+    res.sendStatus(500);
   }
 };
 
@@ -98,10 +110,11 @@ const atualizarAudio = async (idLicao, files) => {
 
   if (audioRegistro) {
     await deletarAudioService(audioRegistro.idAudio);
-    const novoAudioId = await salvarAudio(files);
-    audioRegistro.idAudio = novoAudioId;
-    await audioRegistro.save();
   }
+
+  const novoAudioId = await salvarAudio(files);
+  audioRegistro.idAudio = novoAudioId;
+  await audioRegistro.save();
 };
 
 export { salvarAudio, streamAudioService, deletarAudioService, atualizarAudio };
