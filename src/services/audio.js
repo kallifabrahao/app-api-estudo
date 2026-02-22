@@ -113,6 +113,15 @@ const atualizarAudio = async (idLicao, files) => {
   }
 
   const novoAudioId = await salvarAudio(files);
+
+  if(!audioRegistro) {
+    await Audio.create({
+      idLicao,
+      idAudio: novoAudioId,
+    });
+    return;
+  }
+  
   audioRegistro.idAudio = novoAudioId;
   await audioRegistro.save();
 };
